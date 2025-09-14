@@ -1,6 +1,7 @@
 {
-  "name": "priya/complaints-api",
-  "description": "A simple PHP API for inserting complaints into MySQL on Railway",
-  "type": "project",
-  "require": {}
+  "require": {
+    "php": "^8.0"
+  }
 }
+
+
