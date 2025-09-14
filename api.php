@@ -4,20 +4,20 @@ ini_set('display_errors', 1);
 header('Content-Type: application/json; charset=utf-8');
 
 // Railway MySQL credentials
-$host = "mysql://root:VCVTsPvazINDiVuBsmzicmrxFhuZddNW@metro.proxy.rlwy.net:30156/railway";   // e.g. containers-us-west-xx.railway.app
-$port = "3306";           // e.g. 12345
-$user = "root";       // from Railway
-$pass = "VCVTsPvazINDiVuBsmzicmrxFhuZddNW";       // from Railway
-$db   = "railway";       // from Railway
+$DB_HOST = "metro.proxy.rlwy.net";   // Railway host
+$DB_PORT = 30156;                    // Railway port
+$DB_USER = "root";                   // Railway user
+$DB_PASS = "VCVTsPvazINDiVuBsmzicmrxFhuZddNW";  // Railway password
+$DB_NAME = "railway";                // Railway database name
 
-$conn = new mysqli($host, $user, $pass, $db, $port);
+$conn = new mysqli($DB_HOST, $DB_USER, $DB_PASS, $DB_NAME, $DB_PORT);
 
 if ($conn->connect_error) {
     die(json_encode(["error" => "Connection failed: " . $conn->connect_error]));
 }
 
-// Allow only POST requests
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // collect POST values
     $serial     = $_POST['serial'] ?? '';
     $problem    = $_POST['problem'] ?? '';
     $unit       = $_POST['unit'] ?? '';
@@ -25,14 +25,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name       = $_POST['name'] ?? '';
     $phone      = $_POST['phone'] ?? '';
 
-    if (empty($serial) || empty($problem) || empty($unit) || empty($department) || empty($name) || empty($phone)) {
+    if (!$serial || !$problem || !$unit || !$department || !$name || !$phone) {
         echo json_encode(["error" => "All fields are required"]);
         exit;
     }
 
-    $sql = "INSERT INTO complaints_table (serial, problem, unit, department, name, phone)
+    $sql = "INSERT INTO complaints_table (serial, problem, unit, department, name, phone) 
             VALUES (?, ?, ?, ?, ?, ?)";
-
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("ssssss", $serial, $problem, $unit, $department, $name, $phone);
 
@@ -43,8 +42,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     $stmt->close();
-} else {
-    echo json_encode(["error" => "Only POST requests are allowed"]);
+}
+elseif ($_SERVER['REQUEST_METHOD'] === 'GET') {
+    // return all rows
+    $res = $conn->query("SELECT * FROM complaints_table ORDER BY id DESC");
+    $rows = [];
+    while ($r = $res->fetch_assoc()) {
+        $rows[] = $r;
+    }
+    echo json_encode($rows);
+}
+else {
+    echo json_encode(["error" => "Only GET and POST allowed"]);
 }
 
 $conn->close();
