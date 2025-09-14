@@ -3,14 +3,13 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 header('Content-Type: application/json; charset=utf-8');
 
-// Railway MySQL credentials
-$DB_HOST = "metro.proxy.rlwy.net";   // Railway host
-$DB_PORT = 30156;                    // Railway port
-$DB_USER = "root";                   // Railway user
-$DB_PASS = "VCVTsPvazINDiVuBsmzicmrxFhuZddNW";  // Railway password
-$DB_NAME = "railway";                // Railway database name
+$host = getenv("DB_HOST");
+$user = getenv("DB_USER");
+$pass = getenv("DB_PASS");
+$db   = getenv("DB_NAME");
+$port = getenv("DB_PORT");
 
-$conn = new mysqli($DB_HOST, $DB_USER, $DB_PASS, $DB_NAME, $DB_PORT);
+$conn = new mysqli($host, $user, $pass, $db, $port);
 
 if ($conn->connect_error) {
     die(json_encode(["error" => "Connection failed: " . $conn->connect_error]));
@@ -58,3 +57,4 @@ else {
 
 $conn->close();
 ?>
+
