@@ -3,14 +3,15 @@ FROM php:8.2-apache
 # Enable mysqli extension for MySQL
 RUN docker-php-ext-install mysqli && docker-php-ext-enable mysqli
 
-# Copy your app into Apache docroot
+# Copy app files
 COPY public/ /var/www/html/
 
-# Tell Apache to use Railway's assigned port
-RUN echo "Listen ${PORT}" > /etc/apache2/ports.conf
+# Copy entrypoint script
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
-# Expose the port (Railway sets $PORT at runtime)
+# Expose port (Railway sets $PORT at runtime)
 EXPOSE ${PORT}
 
-# Start Apache server
-CMD ["apache2-foreground"]
+# Run entrypoint script instead of apache2-foreground directly
+CMD ["/entrypoint.sh"]
