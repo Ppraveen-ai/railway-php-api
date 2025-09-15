@@ -1,17 +1,15 @@
-FROM php:8.2-apache
+FROM php:8.2-cli
 
-# Enable mysqli extension for MySQL
+# Install mysqli
 RUN docker-php-ext-install mysqli && docker-php-ext-enable mysqli
 
-# Copy app files
-COPY public/ /var/www/html/
+# Copy app
+COPY public/ /app
 
-# Copy entrypoint script
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+WORKDIR /app
 
-# Expose port (Railway sets $PORT at runtime)
+# Expose Railway port
 EXPOSE ${PORT}
 
-# Run entrypoint script instead of apache2-foreground directly
-CMD ["/entrypoint.sh"]
+# Run PHP built-in server
+CMD ["sh", "-c", "php -S 0.0.0.0:${PORT} -t /app"]
