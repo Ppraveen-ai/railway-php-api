@@ -5,11 +5,10 @@ RUN docker-php-ext-install mysqli && docker-php-ext-enable mysqli
 
 # Copy app
 COPY public/ /app
-
 WORKDIR /app
 
-# Expose Railway port
-EXPOSE ${PORT}
+# Expose Railway's dynamic port
+EXPOSE 8000
 
-# Run PHP built-in server
-CMD ["sh", "-c", "php -S 0.0.0.0:${PORT} -t /app"]
+# Run PHP built-in server on Railway's $PORT
+CMD ["sh", "-c", "php -S 0.0.0.0:${PORT:-8000} -t /app"]
